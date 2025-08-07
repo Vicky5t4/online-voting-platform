@@ -1,0 +1,103 @@
+import React, { useState } from 'react'
+import axios from 'axios'
+
+const CreatePoll = () => {
+  const [question, setQuestion] = useState('')
+  const [options, setOptions] = useState(['', ''])
+  const API = import.meta.env.VITE_API_BASE_URL
+
+  const handleOptionChange = (index, value) => {
+    const newOptions = [...options]
+    newOptions[index] = value
+    setOptions(newOptions)
+  }
+
+  const addOption = () => setOptions([...options, ''])
+
+  const removeOption = (index) => {
+    const newOptions = options.filter((_, i) => i !== index)
+    setOptions(newOptions)
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    if (!question || options.length < 2) {
+      alert('Please provide a question and at least two options.')
+      return
+    }
+
+    try {
+      const token = localStorage.getItem('token')
+      console.log('API:', API)
+      console.log('Token:', token)
+
+      const response = await axios.post(
+  `${API}/polls/create`,
+  {
+    question,
+    options
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+);
+
+
+      console.log('Poll Created:', response.data)
+      alert('Poll Created ✅')
+      setQuestion('')
+      setOptions(['', ''])
+    } catch (err) {
+      console.error('Error creating poll:', err.response?.data || err.message)
+      alert('Error creating poll ❌')
+    }
+  }
+
+  return (
+    <div className='create-poll-container'>
+      <h2>Create a New Poll</h2>
+      <form className='poll-form' onSubmit={handleSubmit}>
+        <div className='form-group'>
+          <label>Question:</label>
+          <input
+            className='poll-input'
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className='form-group'>
+          <label>Options:</label>
+          {options.map((option, index) => (
+            <div key={index} className='option-group'>
+              <input
+                value={option}
+                onChange={(e) => handleOptionChange(index, e.target.value)}
+                required
+                className='poll-input'
+              />
+              {options.length > 2 && (
+                <button
+                  type="button"
+                  className='remove-button'
+                  onClick={() => removeOption(index)}
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <button type="button" onClick={addOption} className='add-option-button'>Add Option</button><br />
+        <button type="submit" className='submit-button'>Create Poll</button>
+      </form>
+    </div>
+  )
+}
+
+export default CreatePoll

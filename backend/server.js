@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 
 const authRoutes = require('./routes/user');
 const pollRoutes = require('./routes/poll');
@@ -10,16 +9,14 @@ const pollRoutes = require('./routes/poll');
 const app = express();
 
 // Middleware
-const cors = require('cors');
-
-// Allow all origins OR restrict to only Vercel
 app.use(cors({
-  origin: ['https://online-voting-platform-ruddy.vercel.app/'],
+  origin: ['https://online-voting-platform-ruddy.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 
-app.use(bodyParser.json());
+// Modern replacement of body-parser
+app.use(express.json());
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {

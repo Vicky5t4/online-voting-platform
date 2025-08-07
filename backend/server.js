@@ -10,7 +10,15 @@ const pollRoutes = require('./routes/poll');
 const app = express();
 
 // Middleware
-app.use(cors());
+const cors = require('cors');
+
+// Allow all origins OR restrict to only Vercel
+app.use(cors({
+  origin: ['https://online-voting-platform-ruddy.vercel.app/'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
 app.use(bodyParser.json());
 
 // Connect to MongoDB
